@@ -7,7 +7,7 @@
 import scipy.io
 import torchvision.transforms
 import torch
-import numpy
+import numpy as np
 import pandas
 import csv
 import os
@@ -18,6 +18,16 @@ import zipfile
 
 from mit_semseg.models import ModelBuilder, SegmentationModule
 from mit_semseg.utils import colorEncode
+
+
+# get names
+colors = scipy.io.loadmat('../../../data/color150.mat')['colors']
+names = {}
+with open('../../../data/object150_info.csv') as f:
+    reader = csv.reader(f)
+    next(reader)
+    for row in reader:
+        names[int(row[0])] = row[5].split(';')[0]
 
 ### Load in the actual model
 net_encoder = ModelBuilder.build_encoder(
@@ -53,14 +63,15 @@ pil_to_tensor = torchvision.transforms.Compose([
 ])
 
 ### Set up our test image
-data_img = Image.open('../../data/images/I1.png').convert('RGB')
-img = numpy.array(img)
-singleton_batch = {'img_data': pil_to_tensor([None].cuda()}
+pil_image = Image.open('../../../data/images/I1.png').convert('RGB')
+img_orig = np.array(pil_img)
+img_data = pil_to_tensor(img_orig)
+singleton_batch = {'img_data': img_data[None].cuda()}
 output_size = img_data.shape[1:]
 
 ### Run model
 with torch.no_grad():
-    scores = segmentation_module(batch, segSize=output_size)
+    scores = segmentation_module(singleton_batch, segSize=output_size)
 
 ### Get predicted results
 _, preds = torch.max(scores, dim=1)
@@ -79,8 +90,8 @@ for pred in preds:
         if i not in named_counts.keys():
             named_counts[i] = 0
 
-    neat = sroted(named_counts.items(), key=lambda x: x[0])
+    neat = sorted(named_counts.items(), key=lambda x: x[0])
     df.append([y for x, y in neat])
 
-df = pd.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
 df.to_csv('test.csv')

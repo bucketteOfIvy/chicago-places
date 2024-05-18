@@ -1,0 +1,5 @@
+pip install yacs 2>&1 >> install.log
+git init 2>&1 >> install.log
+git remote add origin https://github.com/CSAILVision/semantic-segmentation-pytorch.git 2 >> install.log
+git pull origin master 2>&1 >> install.log
+DOWNLOAD_ONLY=1 .demo/test.sh 2>> install.log
