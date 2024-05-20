@@ -112,7 +112,7 @@ for superbatch in range(SUPERBATCH_N):
         neat = sorted(named_counts.items(), key=lambda x: x[0])
         df.append([y for x, y in neat])
 
-    if superbatch == 1:
+    if superbatch == 0:
         df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
         continue
 
