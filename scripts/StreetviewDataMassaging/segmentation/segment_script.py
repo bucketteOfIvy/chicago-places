@@ -70,8 +70,8 @@ pil_to_tensor = torchvision.transforms.Compose([
 #singleton_batch = {'img_data': img_data[None].cuda()}
 #output_size = img_data.shape[1:]
 
-SUPERBATCH_SIZE = 2500
-SUPERBATCH_N = 10
+SUPERBATCH_SIZE = 1000
+SUPERBATCH_N = 25
 for superbatch in range(SUPERBATCH_N):
     logging.info(f'Starting superbatch number {superbatch}')
 
