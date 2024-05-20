@@ -72,6 +72,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 image_datums = []
 filenames = []
 for f in os.listdir('../../../data/images/'):
+    if f == '.gitkeep': continue
     pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
     image_original = np.array(pil_image)
     image_data = pil_to_tensor(image_original)
