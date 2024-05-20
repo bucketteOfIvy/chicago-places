@@ -78,7 +78,7 @@ for superbatch in range(SUPERBATCH_N):
     image_datums = []
     filenames = []
     low = superbatch * SUPERBATCH_SIZE
-    upper = min((superbatch + 1) * SUPERBATCH_SIZE, len(os.listdir()))
+    upper = min((superbatch + 1) * SUPERBATCH_SIZE, len(os.listdir('../../../data/images/')))
     for f in os.listdir('../../../data/images/')[low:upper]:
         pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
         image_original = np.array(pil_image)
