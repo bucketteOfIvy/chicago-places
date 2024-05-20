@@ -114,7 +114,6 @@ for superbatch in range(SUPERBATCH_N):
 
     if superbatch == 0:
         df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-        continue
     else:
         pandas.concat(
             [
