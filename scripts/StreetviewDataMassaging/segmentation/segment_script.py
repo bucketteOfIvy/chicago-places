@@ -115,10 +115,10 @@ for superbatch in range(SUPERBATCH_N):
     if superbatch == 0:
         df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
         continue
-
-    pandas.concat(
-        [
-            pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
-            pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-        ]
-    ).to_parquet('../../../data/raw/streetview_segments.parquet')
+    else:
+        pandas.concat(
+            [
+                pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
+                pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+            ]
+        ).to_parquet('../../../data/raw/streetview_segments.parquet')
