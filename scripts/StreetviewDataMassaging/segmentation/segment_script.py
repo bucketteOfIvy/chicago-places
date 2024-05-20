@@ -72,7 +72,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 image_datums = []
 filenames = []
 for f in os.listdir('../../../data/images/')[:20]:
-    pil_image = Image.open(f'../../../data/images/{f}).convert('RGB')
+    pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
     image_original = np.array(pil_image)
     image_data = pil_to_tensor(image_original)
     image_datums.append(image_data)
