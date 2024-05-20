@@ -114,14 +114,14 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
 
     if superbatch == 0:
         pandas\
-            .DataFrame(np.array(df).T, index=names.values(), columns=filenames)\
+            .DataFrame(np.array(df).T, columns=names.values(), index=filenames)\
             .to_parquet('../../../data/raw/streetview_segments.parquet')
     else:
         pandas.concat(
             [
                 pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
-                pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-            ]
+                pandas.DataFrame(np.array(df).T, columns=names.values(), index=filenames)
+            ],
         ).to_parquet('../../../data/raw/streetview_segments.parquet')
 
     superbatch += 1
