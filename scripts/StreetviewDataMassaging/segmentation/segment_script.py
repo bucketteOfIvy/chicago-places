@@ -106,4 +106,4 @@ for pred in preds:
     df.append([y for x, y in neat])
 
 df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-df.to_csv('../../../data/raw/streetview_segments.csv')
+df.to_parquet('../../../data/raw/streetview_segments.parquet')
