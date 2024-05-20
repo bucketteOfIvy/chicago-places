@@ -116,6 +116,7 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
         pandas\
             .DataFrame(np.array(df), columns=names.values(), index=filenames)\
             .to_parquet('../../../data/raw/streetview_segments.parquet')
+
         superbatch +=1
 
         continue
@@ -130,6 +131,6 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
             pandas.DataFrame(np.array(df), columns=names.values(), index=filenames)
         ],
         axis=0
-    )
+    ).to_parquet('../../../data/raw/streetview_segments.parquet')
 
     superbatch += 1
