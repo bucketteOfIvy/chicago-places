@@ -120,8 +120,16 @@ while superbatch * SUPERBATCH_SIZE < 150: #len(os.listdir('../../../data/images/
         
         continue
 
-    pandas.read_parquet('../../../data/raw/streetview_segments.parquet')\
-        .join(pandas.DataFrame(np.array(df), columns=names.values(), index=filenames))\
-        .to_parquet('../../../data/raw/streetview_segments.parquet')
+    # pandas.read_parquet('../../../data/raw/streetview_segments.parquet')\
+    #     .join(pandas.DataFrame(np.array(df), columns=names.values(), index=filenames))\
+    #     .to_parquet('../../../data/raw/streetview_segments.parquet')
+
+    pandas.concat(
+        [
+            pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
+            pandas.DataFrame(np.array(df), columns=names.values(), index=filenames)
+        ],
+        axis=0
+    )
 
     superbatch += 1
