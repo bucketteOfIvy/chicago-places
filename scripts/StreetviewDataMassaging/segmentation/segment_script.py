@@ -72,7 +72,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 
 SUPERBATCH_SIZE = 50
 superbatch = 0
-while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
+while superbatch * SUPERBATCH_SIZE < 150: #len(os.listdir('../../../data/images/')):
     logging.info(f'Starting superbatch number {superbatch}')
 
     image_datums = []
@@ -100,7 +100,7 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
     df = []
     for pred in preds:
         unique, counts = np.unique(np.array(pred.cpu()), return_counts=True)
-        
+
         named_counts = {}
         for u, c in zip(unique, counts):
             named_counts[u] = c
@@ -113,14 +113,19 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
         df.append([y for x, y in neat])
 
     if superbatch == 0:
+
+        print(pandas.DataFrame(np.array(df), columns=names.values(), index=filenames))
+
         pandas\
-            .DataFrame(np.array(df).T, columns=names.values(), index=filenames)\
+            .DataFrame(np.array(df), columns=names.values(), index=filenames)\
             .to_parquet('../../../data/raw/streetview_segments.parquet')
     else:
+        t = pandas.DataFrame(np.array(df), columns=names.values(), index=filenames)
+        print(t)
         pandas.concat(
             [
                 pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
-                pandas.DataFrame(np.array(df).T, columns=names.values(), index=filenames)
+                pandas.DataFrame(np.array(df), columns=names.values(), index=filenames)
             ],
         ).to_parquet('../../../data/raw/streetview_segments.parquet')
 
