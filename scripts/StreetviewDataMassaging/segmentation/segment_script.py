@@ -70,9 +70,9 @@ pil_to_tensor = torchvision.transforms.Compose([
 #singleton_batch = {'img_data': img_data[None].cuda()}
 #output_size = img_data.shape[1:]
 
-SUPERBATCH_SIZE = 100
-SUPERBATCH_N = 242
-for superbatch in range(SUPERBATCH_N):
+SUPERBATCH_SIZE = 50
+superbatch = 0
+while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
     logging.info(f'Starting superbatch number {superbatch}')
 
     image_datums = []
@@ -121,3 +121,5 @@ for superbatch in range(SUPERBATCH_N):
                 pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
             ]
         ).to_parquet('../../../data/raw/streetview_segments.parquet')
+
+    superbatch += 1
