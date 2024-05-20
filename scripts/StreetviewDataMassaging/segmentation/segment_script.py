@@ -4,6 +4,7 @@
 # git pull origin master 2>&1 >> install.log
 # DOWNLOAD_ONLY=1 .demo/test.sh 2>> install.log
 
+import logging
 import scipy.io
 import torchvision.transforms
 import torch
@@ -69,45 +70,55 @@ pil_to_tensor = torchvision.transforms.Compose([
 #singleton_batch = {'img_data': img_data[None].cuda()}
 #output_size = img_data.shape[1:]
 
-print('loading data')
-image_datums = []
-filenames = []
-for f in os.listdir('../../../data/images/'):
-    if f == '.gitkeep': continue
-    pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
-    image_original = np.array(pil_image)
-    image_data = pil_to_tensor(image_original)
-    image_datums.append(image_data)
-    filenames.append(f)
+SUPERBATCH_SIZE = 2500
+SUPERBATCH_N = 10
+for superbatch in range(SUPERBATCH_N):
+    logging.info(f'Starting superbatch number {superbatch}')
 
-batch = {'img_data': torch.stack(image_datums).cuda()}
-output_size = image_data.shape[1:]
+    image_datums = []
+    filenames = []
+    low = superbatch * SUPERBATCH_SIZE
+    upper = min((superbatch + 1) * SUPERBATCH_SIZE, len(os.listdir()))
+    for f in os.listdir('../../../data/images/')[low:upper]:
+        pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
+        image_original = np.array(pil_image)
+        image_data = pil_to_tensor(image_original)
+        image_datums.append(image_data)
+        filenames.append(f)
 
-print('data loaded! running model')
+    batch = {'img_data': torch.stack(image_datums).cuda()}
+    output_size = image_data.shape[1:]
 
-### Run model
-with torch.no_grad():
-    scores = segmentation_module(batch, segSize=output_size)
+    ### Run model
+    with torch.no_grad():
+        scores = segmentation_module(batch, segSize=output_size)
 
-### Get predicted results
-_, preds = torch.max(scores, dim=1)
+    ### Get predicted results
+    _, preds = torch.max(scores, dim=1)
 
+    ### Save our result
+    df = []
+    for pred in preds:
+        unique, counts = np.unique(np.array(pred.cpu()), return_counts=True)
+        
+        named_counts = {}
+        for u, c in zip(unique, counts):
+            named_counts[u] = c
 
-### Save our result
-df = []
-for pred in preds:
-    unique, counts = np.unique(np.array(pred.cpu()), return_counts=True)
-    
-    named_counts = {}
-    for u, c in zip(unique, counts):
-        named_counts[u] = c
+        for i, _ in enumerate(names):
+            if i not in named_counts.keys():
+                named_counts[i] = 0
 
-    for i, _ in enumerate(names):
-        if i not in named_counts.keys():
-            named_counts[i] = 0
+        neat = sorted(named_counts.items(), key=lambda x: x[0])
+        df.append([y for x, y in neat])
 
-    neat = sorted(named_counts.items(), key=lambda x: x[0])
-    df.append([y for x, y in neat])
+    if superbatch == 1:
+        df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+        continue
 
-df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-df.to_parquet('../../../data/raw/streetview_segments.parquet')
+    pandas.concat(
+        [
+            pandas.read_parquet('../../../data/raw/streetview_segments.parquet'),
+            pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+        ]
+    ).to_parquet('../../../data/raw/streetview_segments.parquet')
