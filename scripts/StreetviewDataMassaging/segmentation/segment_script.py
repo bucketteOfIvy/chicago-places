@@ -71,7 +71,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 
 image_datums = []
 filenames = []
-for f in os.listdir('../../../data/images/')[:20]:
+for f in os.listdir('../../../data/images/'):
     pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
     image_original = np.array(pil_image)
     image_data = pil_to_tensor(image_original)
@@ -106,4 +106,4 @@ for pred in preds:
     df.append([y for x, y in neat])
 
 df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
-df.to_csv('streetview_imagery.csv')
+df.to_csv('../../../data/raw/streetview_segments.csv')
