@@ -4,11 +4,11 @@
 #SBATCH --output=segmentation.out
 #SBATCH --error=segmentation.err
 #SBATCH --ntasks=1
-#SBATCH --partitions=ssd-gpu
-#SBATCH --account=ssd
+#SBATCH --partition=gpu
+#SBATCH --account=macs30123
 #SBATCH --gres=gpu:1
 #SBATCH --mem-per-cpu=32GB
-#SBATCH --qos=ssd
+
 
 module load python
 

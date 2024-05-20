@@ -21,9 +21,9 @@ from mit_semseg.utils import colorEncode
 
 
 # get names
-colors = scipy.io.loadmat('../../../data/color150.mat')['colors']
+colors = scipy.io.loadmat('../../../data/segmentation/color150.mat')['colors']
 names = {}
-with open('../../../data/object150_info.csv') as f:
+with open('../../../data/segmentation/object150_info.csv') as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:
@@ -64,7 +64,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 
 ### Set up our test image
 pil_image = Image.open('../../../data/images/I1.png').convert('RGB')
-img_orig = np.array(pil_img)
+img_orig = np.array(pil_image)
 img_data = pil_to_tensor(img_orig)
 singleton_batch = {'img_data': img_data[None].cuda()}
 output_size = img_data.shape[1:]
@@ -93,5 +93,5 @@ for pred in preds:
     neat = sorted(named_counts.items(), key=lambda x: x[0])
     df.append([y for x, y in neat])
 
-df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=['I1'])
 df.to_csv('test.csv')
