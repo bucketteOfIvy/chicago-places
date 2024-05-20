@@ -69,6 +69,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 #singleton_batch = {'img_data': img_data[None].cuda()}
 #output_size = img_data.shape[1:]
 
+print('loading data')
 image_datums = []
 filenames = []
 for f in os.listdir('../../../data/images/'):
@@ -81,6 +82,8 @@ for f in os.listdir('../../../data/images/'):
 
 batch = {'img_data': torch.stack(image_datums).cuda()}
 output_size = image_data.shape[1:]
+
+print('data loaded! running model')
 
 ### Run model
 with torch.no_grad():
