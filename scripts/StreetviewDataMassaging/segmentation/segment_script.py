@@ -20,7 +20,7 @@ from mit_semseg.models import ModelBuilder, SegmentationModule
 from mit_semseg.utils import colorEncode
 
 
-# get names
+### Get names
 colors = scipy.io.loadmat('../../../data/segmentation/color150.mat')['colors']
 names = {}
 with open('../../../data/segmentation/object150_info.csv') as f:
@@ -63,15 +63,27 @@ pil_to_tensor = torchvision.transforms.Compose([
 ])
 
 ### Set up our test image
-pil_image = Image.open('../../../data/images/I1.png').convert('RGB')
-img_orig = np.array(pil_image)
-img_data = pil_to_tensor(img_orig)
-singleton_batch = {'img_data': img_data[None].cuda()}
-output_size = img_data.shape[1:]
+#pil_image = Image.open('../../../data/images/I1.png').convert('RGB')
+#img_orig = np.array(pil_image)
+#img_data = pil_to_tensor(img_orig)
+#singleton_batch = {'img_data': img_data[None].cuda()}
+#output_size = img_data.shape[1:]
+
+image_datums = []
+filenames = []
+for f in os.listdir('../../../data/images/')[:20]:
+    pil_image = Image.open(f).convert('RGB')
+    image_original = np.array(pil_image)
+    image_data = pil_to_tensor(image_original)
+    image_datums.append(image_data)
+    filenames.append(f)
+
+batch = {'img_data': torch.stack(image_datums).cuda()}
+output_size = image_data.shape[1:]
 
 ### Run model
 with torch.no_grad():
-    scores = segmentation_module(singleton_batch, segSize=output_size)
+    scores = segmentation_module(batch, segSize=output_size)
 
 ### Get predicted results
 _, preds = torch.max(scores, dim=1)
@@ -93,5 +105,5 @@ for pred in preds:
     neat = sorted(named_counts.items(), key=lambda x: x[0])
     df.append([y for x, y in neat])
 
-df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=['I1'])
-df.to_csv('test.csv')
+df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+df.to_csv('streetview_imagery.csv')
