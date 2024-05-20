@@ -72,7 +72,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 
 SUPERBATCH_SIZE = 50
 superbatch = 0
-while superbatch * SUPERBATCH_SIZE < 150: #len(os.listdir('../../../data/images/')):
+while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
     logging.info(f'Starting superbatch number {superbatch}')
 
     image_datums = []
@@ -113,13 +113,11 @@ while superbatch * SUPERBATCH_SIZE < 150: #len(os.listdir('../../../data/images/
         df.append([y for x, y in neat])
 
     if superbatch == 0:
-        u, c = np.unique(np.array([i for i in names.values()]), return_counts=True)
-        print(np.asarray((u, c)).T)
         pandas\
             .DataFrame(np.array(df), columns=names.values(), index=filenames)\
             .to_parquet('../../../data/raw/streetview_segments.parquet')
         superbatch +=1
-        
+
         continue
 
     # pandas.read_parquet('../../../data/raw/streetview_segments.parquet')\
