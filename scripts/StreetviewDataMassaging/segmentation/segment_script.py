@@ -113,7 +113,9 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
         df.append([y for x, y in neat])
 
     if superbatch == 0:
-        df = pandas.DataFrame(np.array(df).T, index=names.values(), columns=filenames)
+        pandas\
+            .DataFrame(np.array(df).T, index=names.values(), columns=filenames)\
+            .to_parquet('../../../data/raw/streetview_segments.parquet')
     else:
         pandas.concat(
             [
