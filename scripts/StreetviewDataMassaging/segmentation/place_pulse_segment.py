@@ -74,7 +74,7 @@ pil_to_tensor = torchvision.transforms.Compose([
 ])
 
 ### Set up our test image
-SUPERBATCH_SIZE = 50
+SUPERBATCH_SIZE = 10
 superbatch = 0
 while superbatch * SUPERBATCH_SIZE < len(relevant_filenames):
 
@@ -82,9 +82,9 @@ while superbatch * SUPERBATCH_SIZE < len(relevant_filenames):
     filenames = []
     low = superbatch * SUPERBATCH_SIZE
     upper = min((superbatch + 1) * SUPERBATCH_SIZE, len(relevant_filenames))
-    
+
     with zipfile.ZipFile('../../../data/place-pulse-2.0.zip') as f:
-        for n in len(relevant_filenames)[low:upper]:
+        for n in relevant_filenames[low:upper]:
             pil_image = Image.open(f.open(n)).convert('RGB')
             image_original = np.array(pil_image)
             image_data = pil_to_tensor(image_original)

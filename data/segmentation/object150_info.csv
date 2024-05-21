@@ -129,7 +129,7 @@ Idx,Ratio,Train,Val,Stuff,Name
 128,0.0004,347,36,0,bicycle;bike;wheel;cycle
 129,0.0004,52,5,1,lake
 130,0.0004,246,22,0,dishwasher;dish;washer;dishwashing;machine
-131,0.0004,108,13,0,screen;silver;screen;projection;screen
+131,0.0004,108,13,0,screen2;silver;screen;projection;screen
 132,0.0004,201,30,0,blanket;cover
 133,0.0004,285,21,0,sculpture
 134,0.0004,268,27,0,hood;exhaust;hood
