@@ -80,6 +80,7 @@ while superbatch * SUPERBATCH_SIZE < len(os.listdir('../../../data/images/')):
     low = superbatch * SUPERBATCH_SIZE
     upper = min((superbatch + 1) * SUPERBATCH_SIZE, len(os.listdir('../../../data/images/')))
     for f in os.listdir('../../../data/images/')[low:upper]:
+        if f == '.gitignore': continue
         pil_image = Image.open(f'../../../data/images/{f}').convert('RGB')
         image_original = np.array(pil_image)
         image_data = pil_to_tensor(image_original)
