@@ -11,8 +11,5 @@ if __name__ == "__main__":
     with requests.get(DOWNLOAD_LINK, stream=True) as r:
         r.raise_for_status()
         with open('../../data/place-pulse-2.0.zip', 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192): 
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                #if chunk: 
+            for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
