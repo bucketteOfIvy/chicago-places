@@ -1,2 +1,2 @@
 # chicago-places
-GitHub for a project looking at the built environment in Chicago using Google Streetview data (and, time allowing, place reviews from Yelp!)
+GitHub for a project investigating the regionalization of the opioid risk environment in Chicago. More to come.
