@@ -9,11 +9,11 @@
 from pyspark.sql import SparkSession
 from pyspark.ml import Pipeline
 from pyspark.ml.regression import LinearRegression, RandomForestRegressor
-from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import VectorAssembler, RobustScaler
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 import pyspark.sql.functions as F
-
+import numpy as np
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -26,6 +26,8 @@ depressing_scores = depressing_scores\
     [['location_id', 'trueskill_score']]\
     .withColumnRenamed(existing='trueskill_score', new='depressingness_score')
 
+depressing_scores = depressing_scores.withColumn('depressingness_score', depressing_scores['depressingness_score'].cast('float'))
+
 livelier_scores = spark.read.option('header', True)\
     .csv('../../../data/raw/qscores.tsv', sep='\t')
 
@@ -33,6 +35,8 @@ livelier_scores = livelier_scores\
     .filter((F.col('study_id') == '50f62c41a84ea7c5fdd2e454'))\
     [['location_id', 'trueskill_score']]\
     .withColumnRenamed(existing='trueskill_score', new='liveliness_score')
+
+livelier_scores = livelier_scores.withColumn('liveliness_score', livelier_scores['liveliness_score'].cast('float'))
 
 pp_segs = spark.read.parquet('../../../data/raw/place_pulse_segments.parquet')\
                     .withColumn('location_id',
@@ -46,11 +50,12 @@ labeled_segs = pp_segs\
                     .join(livelier_scores, on='location_id', how='right')\
                     .join(depressing_scores, on='location_id', how='right')
 
-# We use all of our features.
-features = [col for column in pp_segs.columns if column != 'location_id']
+# We use 18 features selected due to their prominence.
+features = ['road', 'sky', 'tree', 'building', 'grass', 'car', 'sidewalk', 'wall', 'earth', 'fence', 'plant', 'field', 'path', 'house', 'ceiling', 'floor', 'signboard', 'truck']
 assembler = VectorAssembler(
     inputCols=features,
-    outputCol='features'
+    outputCol='features',
+    handleInvalid='skip'
 )
 
 # But we scale them
@@ -75,23 +80,23 @@ depressing_rf_pipeline = Pipeline(stages=[assembler, scaler, depressing_rf])
 
 # Param grids
 lively_lir_params = ParamGridBuilder()\
-    .addGrid(lively_lir.regParam, np.arange(0, .5, .01))\
+    .addGrid(lively_lir.regParam, [0, .5])\
     .addGrid(lively_lir.elasticNetParam, [0, 1])\
     .build()
 
 depressing_lir_params = ParamGridBuilder()\
-    .addGrid(depressing_lir.regParam, np.arange(0, .5, .01))\
+    .addGrid(depressing_lir.regParam, [0, .5])\
     .addGrid(depressing_lir.elasticNetParam, [0, 1])\
     .build()
     
 lively_rf_params = ParamGridBuilder()\
-    .addGrid(lively_rf.maxDepth, [5, 10, 15])\
-    .addGrid(lively_rf.numTrees, [100, 150, 200])\
+    .addGrid(lively_rf.maxDepth, [10, 15])\
+    .addGrid(lively_rf.numTrees, [150, 200])\
     .build()
 
 depressing_rf_params = ParamGridBuilder()\
-    .addGrid(depressing_rf.maxDepth, [5, 10, 15])\
-    .addGrid(depressing_rf.numTrees, [100, 150, 200])\
+    .addGrid(depressing_rf.maxDepth, [10, 15])\
+    .addGrid(depressing_rf.numTrees, [150, 200])\
     .build()
 
 # evaluators
@@ -100,22 +105,22 @@ depressing_evaluator = RegressionEvaluator(labelCol='depressingness_score')
 
 # crossvals for 5 fold cross val
 lively_lir_cv = CrossValidator(estimator=lively_lir_pipeline,
-                              estimatorParamMap=lively_lir_params,
+                              estimatorParamMaps=lively_lir_params,
                               evaluator=lively_evaluator,
                               numFolds=5)
 
 lively_rf_cv = CrossValidator(estimator=lively_rf_pipeline,
-                              estimatorParamMap=lively_rf_params,
+                              estimatorParamMaps=lively_rf_params,
                               evaluator=lively_evaluator,
                               numFolds=5)
 
 depressing_lir_cv = CrossValidator(estimator=depressing_lir_pipeline,
-                              estimatorParamMap=depressing_lir_params,
+                              estimatorParamMaps=depressing_lir_params,
                               evaluator=depressing_evaluator,
                               numFolds=5)
 
 depressing_rf_cv = CrossValidator(estimator=depressing_rf_pipeline,
-                              estimatorParamMap=depressing_rf_params,
+                              estimatorParamMaps=depressing_rf_params,
                               evaluator=depressing_evaluator,
                               numFolds=5)
 
@@ -125,10 +130,10 @@ train.persist()
 test.persist()
 
 # CVs
-lively_lir_cv.fit(train)
-lively_rf_cv.fit(train)
-depressing_lir_cv.fit(train)
-depressing_rf_cv.fit(train)
+lively_lir_cv = lively_lir_cv.fit(train)
+lively_rf_cv = lively_rf_cv.fit(train)
+depressing_lir_cv = depressing_lir_cv.fit(train)
+depressing_rf_cv = depressing_rf_cv.fit(train)
 
 # Evaluate performance
 lively_lir_rmse = lively_evaluator.evaluate(lively_lir_cv.transform(test))
