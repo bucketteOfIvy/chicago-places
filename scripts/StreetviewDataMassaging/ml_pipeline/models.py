@@ -30,7 +30,7 @@ livelier_scores = spark.read.option('header', True)\
     .csv('../../../data/raw/qscores.tsv', sep='\t')
 
 livelier_scores = livelier_scores\
-    .filter((F.col('livelier_id') == '50f62c41a84ea7c5fdd2e454'))\
+    .filter((F.col('study_id') == '50f62c41a84ea7c5fdd2e454'))\
     [['location_id', 'trueskill_score']]\
     .withColumnRenamed(existing='trueskill_score', new='liveliness_score')
 
