@@ -12,23 +12,23 @@ from pyspark.ml.regression import LinearRegression, RandomForestRegressor
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
-import python.sql.functions as F
+import pyspark.sql.functions as F
 
 
 spark = SparkSession.builder.getOrCreate()
 
 # Get data
-depressing_scores = spark.read.csv('../../data/raw/qscores.tsv', sep='\t')\
+depressing_scores = spark.read.csv('../../../data/raw/qscores.tsv', sep='\t')\
     .filter((F.col('study_id') == '50f62ccfa84ea7c5fdd2e459'))\
     .select('location_id', 'trueskill.score')\
     .withColumnRenamed('trueskill.score', 'depressingness_score')
 
-livelier_scores = spark.read.csv('../../data/raw/qscores.tsv', sep='\t')\
+livelier_scores = spark.read.csv('../../../data/raw/qscores.tsv', sep='\t')\
     .filter((F.col('livelier_id') == '50f62c41a84ea7c5fdd2e454'))\
     .select('location_id', 'trueskill.score')\
     .withColumnRenamed('trueskill.score', 'liveliness_score')
 
-pp_segs = spark.read.parquet('../../data/raw/place_pulse_segments.parquet')\
+pp_segs = spark.read.parquet('../../../data/raw/place_pulse_segments.parquet')\
                     .reset_index()\
                     .withColumn('location_id',
                         F.split(
@@ -135,8 +135,8 @@ depressing_rf_rmse = depressing_evalator.evaluate(depressing_rf_cv.transform(tes
 print('========================')
 print('-- Lively Performances --')
 print(f'Best RMSE for Linear Regression: {lively_lir_rmse}')
-print(f'Best RMSE for RF Regression: '{lively_rf_rmse})
+print(f'Best RMSE for RF Regression: {lively_rf_rmse}')
 print('-- Depressing Performances --')
 print(f'Best RMSE for Linear Regression: {depressing_lir_rmse}')
-print(f'Best RMSE for RF Regression: '{depressing_rf_rmse})
+print(f'Best RMSE for RF Regression: {depressing_rf_rmse}')
 print('===========================')

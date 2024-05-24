@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=chicago-places-ml
-#SBATCH --output=output.out
-#SBATCH --error=error.err
+#SBATCH --output=spark.out
+#SBATCH --error=spark.err
 #SBATCH --ntasks=8
 #SBATCH --partition=caslake
 #SBATCH --account=macs30123
