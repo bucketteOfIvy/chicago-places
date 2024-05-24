@@ -10,7 +10,7 @@ In sum, our study selects variables within the social, economic, and political e
 
 
 In fewer words and more colors, the following map of narcotic crimes (white points) overlaid on our three clusters sums up our results nicely:
-![Resultant Image](https://github.com/bucketteOfIvy/chicago-places/blob/main/figures/narcotic_cluster_maps.svg)
+![Side by side of of our three regionalized cluster maps with white narcotic dots depicted on top -- narcotic crime hotspots tend to occur within either highly a localized cluster, or within one large cluster.](https://github.com/bucketteOfIvy/chicago-places/blob/main/figures/narcotic_cluster_maps.svg)
 
 # The Big Data Component 
 
@@ -33,9 +33,11 @@ Our study sought to characterize three aspects of the built environment -- perce
 
 # Next Steps and Future Improvements
 
-The benefit of our current pipeline is that it is highly scaleable and segmentable. Our current largest limitation is the limited predictability of our segmented images. However, this is most likely due to our choice of semantic segmentation model, with the chosen model containing mostly terms which are better suited towards classifying interior scenes than outdoor scenes. Over the summer, we thus plan to revise step 4 of our pipeline by changing the specific image segmentation model chosen. 
+While we only decided to scale up to one of our resultant datasets, this project has still been a large success: we have a highly scaleable and segmentable pipeline which--while it doesn't produce the _nicest_ predictions yet--should be editable so that it does. In fact, our low predictabiltiy is likely due to our choice of semantic segmentation model, with the chosen model containing mostly terms which are better suited towards classifying interior scenes than outdoor scenes. However, our code shouldn't take more than minor edits to load and utilize different pretrained pytorch models, so this should be an issue that can easily revised during the summer.
 
-Additionally, scalability of our pipeline means we can easily deploy this workflow in other cities. Specifically deploying this pipeline in New York City, would only require the acquisition of another city street shapefile and additional Google StreetView API credits. Scaleability thus opens the door for future work comparing the risk environment between multiple settings.
+Additionally, the scalability of our pipeline means we can easily deploy this workflow in other cities. Deploying this pipeline in New York City, for example, would only require the acquisition of another city street shapefile and additional Google StreetView API credits. Scaleability thus opens the door for future work comparing the risk environment between multiple settings and may enable a nice MA Thesis to emerge from this project.
+
+<img src="figures/relative_greenery_map.png" alt="A map of relative greenery in Chicago; the areas of lower greenery -- roadways -- are highly visible on the map" width="600px" height="800px">
 
 # Copying
 
