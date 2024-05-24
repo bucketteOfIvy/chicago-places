@@ -22,5 +22,4 @@ for file in FILES:
     rename_dict = {
         column_name:re.sub(r'\.', '_', column_name) for column_name in data.columns
     }
-    print(rename_dict)
     data.rename(rename_dict, axis=1).to_csv(f'../../../data/raw/{file}', sep='\t')
