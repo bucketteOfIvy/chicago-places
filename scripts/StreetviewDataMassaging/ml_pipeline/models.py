@@ -24,7 +24,7 @@ depressing_scores = spark.read.option('header', True)\
 depressing_scores = depressing_scores\
     .filter((F.col('study_id') == '50f62ccfa84ea7c5fdd2e459'))\
     [['location_id', 'trueskill_score']]\
-    .withColumnRenamed('trueskill_score', 'depressingness_score')
+    .withColumnRenamed(existing='trueskill_score', new='depressingness_score')
 
 livelier_scores = spark.read.option('header', True)\
     .csv('../../../data/raw/qscores.tsv', sep='\t')
@@ -32,7 +32,7 @@ livelier_scores = spark.read.option('header', True)\
 livelier_scores = livelier_scores\
     .filter((F.col('livelier_id') == '50f62c41a84ea7c5fdd2e454'))\
     [['location_id', 'trueskill_score']]\
-    .withColumnRenamed('trueskill_score', 'liveliness_score')
+    .withColumnRenamed(existing='trueskill_score', new='liveliness_score')
 
 pp_segs = spark.read.parquet('../../../data/raw/place_pulse_segments.parquet')\
                     .reset_index()\
