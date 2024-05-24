@@ -37,9 +37,9 @@ livelier_scores = livelier_scores\
 pp_segs = spark.read.parquet('../../../data/raw/place_pulse_segments.parquet')\
                     .withColumn('location_id',
                         F.split(
-                            F.col('index'), '_'
+                            F.col('__index_level_0__'), '_'
                         )[2])\
-                    .drop('index')
+                    .drop('__index_level_0__')
 
 # Merge
 labeled_segs = pp_segs\
