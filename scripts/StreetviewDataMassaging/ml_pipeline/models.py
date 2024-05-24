@@ -35,7 +35,6 @@ livelier_scores = livelier_scores\
     .withColumnRenamed(existing='trueskill_score', new='liveliness_score')
 
 pp_segs = spark.read.parquet('../../../data/raw/place_pulse_segments.parquet')\
-                    .reset_index()\
                     .withColumn('location_id',
                         F.split(
                             F.col('index'), '_'
