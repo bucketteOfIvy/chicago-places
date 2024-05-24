@@ -18,12 +18,14 @@ import pyspark.sql.functions as F
 spark = SparkSession.builder.getOrCreate()
 
 # Get data
-depressing_scores = spark.read.csv('../../../data/raw/qscores.tsv', sep='\t')\
+depressing_scores = spark.read.option('header', True)\
+    .csv('../../../data/raw/qscores.tsv', sep='\t')\
     .filter((F.col('study_id') == '50f62ccfa84ea7c5fdd2e459'))\
     .select('location_id', 'trueskill.score')\
     .withColumnRenamed('trueskill.score', 'depressingness_score')
 
-livelier_scores = spark.read.csv('../../../data/raw/qscores.tsv', sep='\t')\
+livelier_scores = spark.read.option('header', True)\
+    .csv('../../../data/raw/qscores.tsv', sep='\t')\
     .filter((F.col('livelier_id') == '50f62c41a84ea7c5fdd2e454'))\
     .select('location_id', 'trueskill.score')\
     .withColumnRenamed('trueskill.score', 'liveliness_score')
